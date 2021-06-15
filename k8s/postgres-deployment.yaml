@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec: 
+  replicas: 1
+  selector: 
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+    #New key:Value pair for PVC - This will allocate us with storage
+      volumes: 
+      - name: postgres-storage
+        persistentVolumeClaim: 
+          #dtabase-persistent-volume-claim.yaml
+          claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          # Config to apply and utilise the volume we now have access too
+          volumeMounts:
+            # volume name and volumeMount name are identical
+            - name: postgres-storage
+            # default storage location/ mountpath for postgres= 
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+          # environment variable added for secret to link with server-deployment
+          env: 
+          # POSTGRES_PASSWORD taken from DockerHub documentation 
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
+
+
