@@ -6,7 +6,8 @@ metadata:
 spec:
   type: ClusterIP
   selector: 
-    component: Server
+  # ammended component had a capital 'S' on server
+    component: server
   ports:
     - port: 5000
       targetPort: 5000
